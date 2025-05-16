@@ -1,9 +1,17 @@
 import argparse
-import sys
 
-from conf import config as config
+from conf import config
 
 def input_argparse():
+    """
+    Generates argparse for input arguments
+
+    Args:
+        None
+
+    Returns:
+        The result of parser.parse_args() after parser has been constructed
+    """
     # Setting up argparse for CLI execution
     parser = argparse.ArgumentParser(prog=config.tool_name)
     parser.add_argument(
