@@ -5,9 +5,16 @@ Author: Spike Graham
 Copyright (c) 2025 Spike Graham
 All rights reserved.
 
-This software is provided for reference purposes only.
-No license is granted to use, reproduce, modify, or distribute this code
-without explicit written permission from the author.
+This software is provided for personal, non-commercial use only.  
+You may view and run this software for personal educational or non-profit purposes.
+
+You may not:
+- Use this software in any commercial or enterprise context.
+- Distribute modified or unmodified versions.
+- Sell or include this software as part of a paid or monetized service or product.
+- Use this software in any for-profit capacity.
+
+All rights are reserved by the author.
 """
 
 import csv
