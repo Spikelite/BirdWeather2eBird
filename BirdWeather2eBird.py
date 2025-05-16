@@ -19,16 +19,17 @@ def main():
                 row["Common Name"].strip(), # Common Name
                 genus,                      # Genus
                 species,                    # Species
-                1,                          # Species Count
+                "X",                        # Species Count (int if possible, 
+                                            #                X is best when a real number can not be confirmed)
                 config.SPECIES_COMMENTS,    # Species Comments
                 row["Station"].strip(),     # Location Name
                 row["Latitude"],            # Latitude
                 row["Longitude"],           # Longitude
                 date,                       # Observation Date
                 time,                       # Start Time
-                state,                      # State
-                country,                    # Country
-                config.PROTOCOL,            # Protocol
+                state,                      # State (2-character)
+                country,                    # Country (2-character)
+                config.PROTOCOL,            # Protocol (Stationary, Traveling, Incidental, Historical)
                 config.NUM_OBSERVERS,       # Number of Observers
                 config.DURATION,            # Duration
                 config.ALL_OBS_REPORTED,    # All Observations Reported?
