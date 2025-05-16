@@ -1,3 +1,15 @@
+"""
+BirdWeather2eBird.py
+
+Author: Spike Graham
+Copyright (c) 2025 Spike Graham
+All rights reserved.
+
+This software is provided for reference purposes only.
+No license is granted to use, reproduce, modify, or distribute this code
+without explicit written permission from the author.
+"""
+
 import csv
 
 from conf import config
