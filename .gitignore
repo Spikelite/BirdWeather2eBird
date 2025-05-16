@@ -1,1 +1,29 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Python-specific files
+*.pyo
+*.pyd
+
+# macOS system files
+.DS_Store
+
+# Virtual environments
+venv/
+ENV/
+env/
+.env/
+.venv/
+.env
+
+# Other files to ignore
 *.csv
+*.log
