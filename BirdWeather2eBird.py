@@ -1,8 +1,8 @@
 import csv
 
-from conf import config as config
-from lib import core_processing as core
-from lib import cli_argparse as cli_argparse
+from conf import config
+from lib import core_processing
+from lib import cli_argparse
 
 args = cli_argparse.input_argparse()
 
@@ -12,11 +12,11 @@ def main():
         reader = csv.DictReader(infile)
         writer = csv.writer(outfile, lineterminator="\n")
         for row in reader:
-            date, time = core.parse_timestamp(row["Timestamp"])
+            date, time = core_processing.parse_timestamp(row["Timestamp"])
             sci = row["Scientific Name"].strip().split()
             genus = sci[0] if len(sci) > 0 else ""
             species = sci[1] if len(sci) > 1 else ""
-            #state, country = core.get_location_codes(row["Latitude"], row["Longitude"])
+            #state, country = core_processing.get_location_codes(row["Latitude"], row["Longitude"])
             state = args.state_code
             country = args.country_code
             # The order of these datapoints are strictly required by eBird's Extended Record Format
@@ -24,8 +24,8 @@ def main():
                 row["Common Name"].strip(), # Common Name
                 genus,                      # Genus
                 species,                    # Species
-                "X",                        # Species Count (int if possible, 
-                                            #                X is best when a real number can not be confirmed)
+                "X",                        # Species Count (int if possible, X is best when a real
+                                            #  number can not be confirmed)
                 config.SPECIES_COMMENTS,    # Species Comments
                 row["Station"].strip(),     # Location Name
                 row["Latitude"],            # Latitude
@@ -34,7 +34,7 @@ def main():
                 time,                       # Start Time
                 state,                      # State (2-character)
                 country,                    # Country (2-character)
-                args.protocol,              # Protocol (Stationary, Traveling, Incidental, Historical)
+                args.protocol,              # Protocol (Stationary,Traveling,Incidental,Historical)
                 args.number_of_observers,   # Number of Observers
                 config.DURATION,            # Duration
                 config.ALL_OBS_REPORTED,    # All Observations Reported?
@@ -45,4 +45,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

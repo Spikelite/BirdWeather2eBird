@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from conf import config as config
+from conf import config
 
 def parse_timestamp(ts):
     """
