@@ -13,3 +13,5 @@ SPECIES_COMMENTS = ""
 CHECKLIST_COMMENTS = ""
 
 tool_name = "BirdWeather2eBird"
+log_file_path = "BirdWeather2eBird.log"
+log_level = "INFO"

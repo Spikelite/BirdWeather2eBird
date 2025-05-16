@@ -1,6 +1,62 @@
+"""
+cli_support.py
+
+This library provides utility functions for supporting CLI interactions 
+with BirdWeather2eBird.
+
+It includes functions to:
+- start_logging(): Configure and start CLI based logging
+- input_argparse(): Parse CLI input arguments
+
+Example usage:
+    from lib import cli_support
+
+Author: Spike Graham
+Copyright (c) 2025 Spike Graham
+All rights reserved.
+
+This software is provided for reference purposes only.
+No license is granted to use, reproduce, modify, or distribute this code
+without explicit written permission from the author.
+"""
+
 import argparse
+import logging
 
 from conf import config
+
+def start_logging(log_path, log_level, logger_name):
+    """
+    Builds the logger object for logging within the API
+
+    Args:
+        log_path (str): Path to the log file for logging
+        log_level (str): Logging level to use, INFO/ERROR/DEBUG
+
+    Returns:
+        object: The logger object used for logging output
+    """
+    logger = logging.getLogger(logger_name)
+    output_format = logging.Formatter(
+        '%(asctime)s [%(levelname)s]: %(message)s', "%Y-%m-%d %H:%M:%S")
+    ## Setting log level
+    if log_level == "INFO":
+        logger.setLevel(logging.INFO)
+    elif log_level == "ERROR":
+        logger.setLevel(logging.ERROR)
+    elif log_level == "DEBUG":
+        logger.setLevel(logging.DEBUG)
+    else:
+        logger.setLevel(logging.INFO)
+    fh = logging.FileHandler(log_path)
+    fh.setFormatter(output_format)
+    logger.addHandler(fh)
+    ## Create stdout handler
+    stdout = logging.StreamHandler()
+    stdout.setFormatter(output_format)
+    logger.addHandler(stdout)
+    logger.debug('Logging Setup')
+    return logger
 
 def input_argparse():
     """

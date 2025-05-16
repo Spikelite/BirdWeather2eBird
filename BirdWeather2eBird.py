@@ -14,11 +14,15 @@ import csv
 
 from conf import config
 from lib import core_processing
-from lib import cli_argparse
+from lib import cli_support
 
-args = cli_argparse.input_argparse()
+args = cli_support.input_argparse()
+logger = cli_support.start_logging(config.log_file_path, config.log_level, config.tool_name)
 
 def main():
+    logger.info('Running BirdWeather2eBird')
+    logger.debug(f'Input File: {args.input_file}')
+    logger.debug(f'Output File: {args.output_file}')
     with open(args.input_file, newline="", encoding="utf-8") as infile, \
          open(args.output_file, "w", newline="", encoding="utf-8") as outfile:
         reader = csv.DictReader(infile)
@@ -54,6 +58,7 @@ def main():
                 config.AREA_COVERED,        # Area Covered
                 args.comments               # Checklist Comments
             ])
+    logger.info('BirdWeather2eBird ran Successfully!')
 
 if __name__ == "__main__":
     main()
