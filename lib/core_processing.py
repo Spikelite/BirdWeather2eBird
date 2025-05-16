@@ -1,3 +1,25 @@
+"""
+core_processing.py
+
+This library provides core functions processing .csv files as a part of
+BirdWeather2eBird.
+
+It includes functions to:
+- parse_timestamp(): Parse and convert the timestamps provided by BirdWeather to be compatible with eBird's timestamps
+- get_location_codes(): (Work In Progress) Get the state and country location codes from Latitude & Longitude
+
+Example usage:
+    from lib import cli_support
+
+Author: Spike Graham
+Copyright (c) 2025 Spike Graham
+All rights reserved.
+
+This software is provided for reference purposes only.
+No license is granted to use, reproduce, modify, or distribute this code
+without explicit written permission from the author.
+"""
+
 from datetime import datetime
 
 from conf import config
