@@ -2,19 +2,7 @@ import csv
 
 from datetime import datetime
 
-INPUT_CSV = "birdweather_export.csv"
-OUTPUT_CSV = "ebird_upload.csv"
-
-STATE = ""
-COUNTRY = ""
-PROTOCOL = ""
-NUM_OBSERVERS = 1
-DURATION = 5
-ALL_OBS_REPORTED = "Y"
-DISTANCE_COVERED = ""
-AREA_COVERED = ""
-SPECIES_COMMENTS = ""
-CHECKLIST_COMMENTS = ""
+from conf import config as config
 
 def parse_timestamp(ts):
     """
@@ -45,14 +33,14 @@ def get_location_codes(lat, lon):
     Returns:
         Tuple containing (state_code,country_code), where the code will be a 2-character code or empty
     """
-    state_code = STATE
-    country_code = COUNTRY
+    state_code = config.STATE
+    country_code = config.COUNTRY
 
     return state_code, country_code
 
 def main():
-    with open(INPUT_CSV, newline="", encoding="utf-8") as infile, \
-         open(OUTPUT_CSV, "w", newline="", encoding="utf-8") as outfile:
+    with open(config.INPUT_CSV, newline="", encoding="utf-8") as infile, \
+         open(config.OUTPUT_CSV, "w", newline="", encoding="utf-8") as outfile:
         reader = csv.DictReader(infile)
         writer = csv.writer(outfile, lineterminator="\n")
         for row in reader:
@@ -66,7 +54,7 @@ def main():
                 genus,
                 species,
                 1,
-                SPECIES_COMMENTS,
+                config.SPECIES_COMMENTS,
                 row["Station"].strip(),
                 row["Latitude"],
                 row["Longitude"],
@@ -74,13 +62,13 @@ def main():
                 time,
                 state,
                 country,
-                PROTOCOL,
-                NUM_OBSERVERS,
-                DURATION,
-                ALL_OBS_REPORTED,
-                DISTANCE_COVERED,
-                AREA_COVERED,
-                CHECKLIST_COMMENTS
+                config.PROTOCOL,
+                config.NUM_OBSERVERS,
+                config.DURATION,
+                config.ALL_OBS_REPORTED,
+                config.DISTANCE_COVERED,
+                config.AREA_COVERED,
+                config.CHECKLIST_COMMENTS
             ])
 
 if __name__ == "__main__":
