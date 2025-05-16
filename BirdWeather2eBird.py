@@ -2,10 +2,13 @@ import csv
 
 from conf import config as config
 from lib import core_processing as core
+from lib import cli_argparse as cli_argparse
+
+args = cli_argparse.input_argparse()
 
 def main():
-    with open(config.INPUT_CSV, newline="", encoding="utf-8") as infile, \
-         open(config.OUTPUT_CSV, "w", newline="", encoding="utf-8") as outfile:
+    with open(args.input_file, newline="", encoding="utf-8") as infile, \
+         open(args.output_file, "w", newline="", encoding="utf-8") as outfile:
         reader = csv.DictReader(infile)
         writer = csv.writer(outfile, lineterminator="\n")
         for row in reader:
@@ -13,7 +16,9 @@ def main():
             sci = row["Scientific Name"].strip().split()
             genus = sci[0] if len(sci) > 0 else ""
             species = sci[1] if len(sci) > 1 else ""
-            state, country = core.get_location_codes(row["Latitude"], row["Longitude"])
+            #state, country = core.get_location_codes(row["Latitude"], row["Longitude"])
+            state = args.state_code
+            country = args.country_code
             # The order of these datapoints are strictly required by eBird's Extended Record Format
             writer.writerow([
                 row["Common Name"].strip(), # Common Name
@@ -29,13 +34,13 @@ def main():
                 time,                       # Start Time
                 state,                      # State (2-character)
                 country,                    # Country (2-character)
-                config.PROTOCOL,            # Protocol (Stationary, Traveling, Incidental, Historical)
-                config.NUM_OBSERVERS,       # Number of Observers
+                args.protocol,              # Protocol (Stationary, Traveling, Incidental, Historical)
+                args.number_of_observers,   # Number of Observers
                 config.DURATION,            # Duration
                 config.ALL_OBS_REPORTED,    # All Observations Reported?
                 config.DISTANCE_COVERED,    # Distance Covered
                 config.AREA_COVERED,        # Area Covered
-                config.CHECKLIST_COMMENTS   # Checklist Comments
+                args.comments               # Checklist Comments
             ])
 
 if __name__ == "__main__":

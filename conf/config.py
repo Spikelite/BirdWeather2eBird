@@ -11,3 +11,5 @@ DISTANCE_COVERED = ""
 AREA_COVERED = ""
 SPECIES_COMMENTS = ""
 CHECKLIST_COMMENTS = ""
+
+tool_name = "BirdWeather2eBird"
