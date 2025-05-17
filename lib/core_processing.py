@@ -26,12 +26,41 @@ You may not:
 
 All rights are reserved by the author.
 """
-import fiona
-
-from shapely.geometry import Point, shape
+import random
+import string
 from datetime import datetime
 
+import fiona
+from shapely.geometry import Point, shape
+
 from conf import config
+
+def generate_random_string(length=6):
+    """
+    Generate a random alphanumeric string of the specified length.
+
+    Args:
+        length (int): Length of the string to generate. Defaults to 6.
+
+    Returns:
+        str: Random string containing lowercase letters and digits.
+    """
+    return ''.join(random.choices(string.ascii_lowercase + string.digits, k=length))
+
+def generate_filename(base_name, date_str):
+    """
+    Create a filename by combining a base name, a random string, and a formatted date.
+
+    Args:
+        base_name (str): Base portion of the filename (e.g., 'FileName').
+        date_str (str): Date in 'MM/DD/YYYY' format.
+
+    Returns:
+        str: Formatted filename in the format 'base-random-MMDDYYYY.csv'.
+    """
+    date_formatted = datetime.strptime(date_str, "%m/%d/%Y").strftime("%m%d%Y")
+    random_str = generate_random_string()
+    return f"{base_name}-{random_str}-{date_formatted}.csv"
 
 def parse_timestamp(ts):
     """

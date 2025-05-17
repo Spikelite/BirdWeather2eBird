@@ -16,8 +16,9 @@ You may not:
 
 All rights are reserved by the author.
 """
-
 import csv
+import os
+from datetime import datetime
 
 from conf import config
 from lib import core_processing
@@ -30,8 +31,23 @@ def main():
     logger.info('Running BirdWeather2eBird')
     logger.debug(f'Input File: {args.input_file}')
     logger.debug(f'Output File: {args.output_file}')
+
+    output_file = None
+    file_date = None
+    if (args.filter_to_date):
+        file_date = args.filter_to_date
+    else:
+        #TODO: Ideally we would pull the date from the file itself, however this is more complicated to efficiently do
+        # and will be accomplished in a future revision.
+        file_date = datetime.today().strftime("%m/%d/%Y")
+    if (args.output_file):
+        output_file = args.output_file
+    else:
+        output_file = os.path.join(config.output_path, 
+                                   core_processing.generate_filename("BirdWeather2eBird" , file_date))
+
     with open(args.input_file, newline="", encoding="utf-8") as infile, \
-         open(args.output_file, "w", newline="", encoding="utf-8") as outfile:
+         open(output_file, "w", newline="", encoding="utf-8") as outfile:
         reader = csv.DictReader(infile)
         writer = csv.writer(outfile, lineterminator="\n")
         # This is used to help determine if detections spanning multiple dates are included
@@ -39,7 +55,8 @@ def main():
         for row in reader:
             date, time = core_processing.parse_timestamp(row["Timestamp"])
             if (args.filter_to_date) and (date != args.filter_to_date):
-                logger.debug(f'Entry outside of provided date filter found, skipping, date was: {date}')
+                logger.debug('Entry outside of provided date filter found, skipping, '
+                             f'date was: {date}')
                 continue
             if date not in unique_dates:
                 unique_dates.append(date)
