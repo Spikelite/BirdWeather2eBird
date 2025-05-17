@@ -97,15 +97,17 @@ def input_argparse():
         "--state_code",
         action="store",
         metavar="XX",
-        help="2-character state code, i.e. WA",
-        default=config.STATE
+        help="Overrides automatic state code detection, " \
+             "must be a 2-character state code, i.e. WA",
+        required=False
     )
     parser.add_argument(
         "--country_code",
         action="store",
         metavar="XX",
-        help="2-character country code, i.e. US",
-        default=config.COUNTRY
+        help="Overrides automatic country code detection, " \
+             "must be a 2-character country code, i.e. US",
+        required=False
     )
     parser.add_argument(
         "-p", 

@@ -28,11 +28,16 @@ cd BirdWeather2eBird
 
 ### 2. (Optional) Create a Virtual Environment
 ```
-python3.11 -m venv venv
+python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
-### 3. Configure the script
+### 3. Install 3rd Party Libraries
+```
+python -m pip install -r requirements.txt
+```
+
+### 4. Configure the script
 At minimum you must configure the following values in `conf/config.py`<br>
 `STATE` - 2-letter state code, leave blank if your country does not use state codes<br>
 `COUNTRY` - 2-letter country code<br>
