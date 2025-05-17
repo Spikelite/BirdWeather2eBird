@@ -12,6 +12,9 @@ AREA_COVERED = ""
 SPECIES_COMMENTS = ""
 CHECKLIST_COMMENTS = ""
 
+country_shape_file = ""
+state_shape_file = ""
+
 tool_name = "BirdWeather2eBird"
 log_file_path = "BirdWeather2eBird.log"
 log_level = "INFO"
