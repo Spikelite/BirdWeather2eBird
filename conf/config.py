@@ -1,5 +1,5 @@
 INPUT_CSV = "birdweather_export.csv"
-OUTPUT_CSV = "ebird_upload.csv"
+output_path = ""
 
 PROTOCOL = ""
 NUM_OBSERVERS = 1
