@@ -26,7 +26,9 @@ You may not:
 
 All rights are reserved by the author.
 """
+import fiona
 
+from shapely.geometry import Point, shape
 from datetime import datetime
 
 from conf import config
@@ -50,17 +52,75 @@ def get_location_codes(lat, lon):
     """
     Gets the state and country codes for the provided latitude (lat) and longitude (lon)
 
-    TODO: Currently this function is hard coded to return hard coded global values, in the future it should be able to
-    dynamically get the location information from the lat/lon
-
     Args:
         lat (float): Latitude
-        long (float): Longitude
+        lon (float): Longitude
 
     Returns:
-        Tuple containing (state_code,country_code), where the code will be a 2-character code or empty
+        Tuple containing (state_code, country_code), where the code will be a 2-character code or empty string if not found
     """
-    state_code = config.STATE
-    country_code = config.COUNTRY
-
+    country_code = country_lookup(lat, lon) or ""
+    state_code = state_lookup(lat, lon) or ""
     return state_code, country_code
+
+def load_shapes(filepath, code_field):
+    """
+    Loads geometric shapes and associated codes from a shapefile
+
+    Args:
+        filepath (str): Path to the shapefile (.shp)
+        code_field (str): Name of the attribute field that contains the desired code (ISO country code or state code)
+
+    Returns:
+        List of tuples in the form (geometry, code), where geometry is a polygon or multipolygon and code is a string
+    """
+    shapes = []
+    with fiona.open(filepath, 'r') as shp:
+        for feature in shp:
+            geom = shape(feature['geometry'])
+            code = feature['properties'][code_field]
+            shapes.append((geom, code))
+    return shapes
+
+def get_optimized_code_lookup(shapes):
+    """
+    Returns an optimized lookup function that determines the code for a given latitude and longitude,
+    assuming most points will fall within the same region. Caches the first matched shape to speed up
+    subsequent lookups.
+
+    Args:
+        shapes (List[Tuple[Polygon, str]]): A list of tuples containing geometries and their associated codes
+
+    Returns:
+        Callable[[float, float], Optional[str]]: A function that takes (lat, lon) and returns the matching code,
+        or None if no match is found
+    """
+    cached_geom = None
+    cached_code = None
+
+    def find_code(lat, lon):
+        nonlocal cached_geom, cached_code
+        point = Point(lon, lat)
+
+        # Check the cached geometry first
+        if cached_geom and cached_geom.contains(point):
+            return cached_code
+
+        # Fall back to scanning all shapes
+        for geom, code in shapes:
+            if geom.contains(point):
+                cached_geom = geom
+                cached_code = code
+                return code
+
+        return None
+
+    return find_code
+
+# Load shapes once to improve performance for repeat lookups
+country_shapes = load_shapes(config.country_shape_file, 'ISO_A2')
+state_shapes = load_shapes(config.state_shape_file, 'STUSPS')
+
+# Create optimized lookup functions once to improve performance
+country_lookup = get_optimized_code_lookup(country_shapes)
+state_lookup = get_optimized_code_lookup(state_shapes)
