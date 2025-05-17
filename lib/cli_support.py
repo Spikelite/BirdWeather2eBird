@@ -80,7 +80,7 @@ def input_argparse():
     parser.add_argument(
         "-i", 
         "--input_file",
-        action="store",
+        type=str,
         metavar="PATH",
         help="Input .csv file path",
         default=config.INPUT_CSV
@@ -88,14 +88,14 @@ def input_argparse():
     parser.add_argument(
         "-o", 
         "--output_file",
-        action="store",
+        type=str,
         metavar="PATH",
         help="Output .csv file path",
         required=False
     )
     parser.add_argument(
         "--state_code",
-        action="store",
+        type=str,
         metavar="XX",
         help="Overrides automatic state code detection, " \
              "must be a 2-character state code, i.e. WA",
@@ -103,7 +103,7 @@ def input_argparse():
     )
     parser.add_argument(
         "--country_code",
-        action="store",
+        type=str,
         metavar="XX",
         help="Overrides automatic country code detection, " \
              "must be a 2-character country code, i.e. US",
@@ -118,17 +118,24 @@ def input_argparse():
     )
     parser.add_argument(
         "--number_of_observers",
-        action="store",
+        type=int,
         metavar="INT",
         help="Number of observers present at time of data collection",
         default=config.NUM_OBSERVERS
     )
     parser.add_argument(
         "--comments",
-        action="store",
+        type=str,
         metavar="STR",
         help="Checklist Comments to include with submissions",
         default=config.CHECKLIST_COMMENTS
+    )
+    parser.add_argument(
+        "--filter_to_date",
+        type=str,
+        metavar="MM/DD/YYYY",
+        help="Filter input data to include only entries from the specified date (format: MM/DD/YYYY).",
+        required=False
     )
 
     return parser.parse_args()

@@ -41,8 +41,15 @@ def main():
          open(args.output_file, "w", newline="", encoding="utf-8") as outfile:
         reader = csv.DictReader(infile)
         writer = csv.writer(outfile, lineterminator="\n")
+        # This is used to help determine if detections spanning multiple dates are included
+        unique_dates = []
         for row in reader:
             date, time = core_processing.parse_timestamp(row["Timestamp"])
+            if (args.filter_to_date) and (date != args.filter_to_date):
+                logger.debug(f'Entry outside of provided date filter found, skipping, date was: {date}')
+                continue
+            if date not in unique_dates:
+                unique_dates.append(date)
             sci = row["Scientific Name"].strip().split()
             genus = sci[0] if len(sci) > 0 else ""
             species = sci[1] if len(sci) > 1 else ""
@@ -80,6 +87,8 @@ def main():
                 config.AREA_COVERED,        # Area Covered
                 args.comments               # Checklist Comments
             ])
+    if len(unique_dates) > 1:
+        logger.warning(f"Multiple dates found in input: {unique_dates}")
     logger.info('BirdWeather2eBird ran Successfully!')
 
 if __name__ == "__main__":
