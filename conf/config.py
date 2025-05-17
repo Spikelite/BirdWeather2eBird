@@ -1,8 +1,6 @@
 INPUT_CSV = "birdweather_export.csv"
 OUTPUT_CSV = "ebird_upload.csv"
 
-STATE = ""
-COUNTRY = ""
 PROTOCOL = ""
 NUM_OBSERVERS = 1
 DURATION = 5
