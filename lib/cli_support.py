@@ -91,7 +91,7 @@ def input_argparse():
         action="store",
         metavar="PATH",
         help="Output .csv file path",
-        default=config.OUTPUT_CSV
+        required=False
     )
     parser.add_argument(
         "--state_code",

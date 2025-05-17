@@ -30,6 +30,13 @@ def main():
     logger.info('Running BirdWeather2eBird')
     logger.debug(f'Input File: {args.input_file}')
     logger.debug(f'Output File: {args.output_file}')
+
+    # output_file = None
+    # if (args.output_file):
+    #     output_file = args.output_file
+    # else:
+    #     output_file = f'{core_processing.generate_filename("BirdWeather2eBird" , date)}'
+
     with open(args.input_file, newline="", encoding="utf-8") as infile, \
          open(args.output_file, "w", newline="", encoding="utf-8") as outfile:
         reader = csv.DictReader(infile)
