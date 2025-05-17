@@ -98,14 +98,14 @@ def input_argparse():
         action="store",
         metavar="XX",
         help="2-character state code, i.e. WA",
-        default=config.STATE
+        required=False
     )
     parser.add_argument(
         "--country_code",
         action="store",
         metavar="XX",
         help="2-character country code, i.e. US",
-        default=config.COUNTRY
+        required=False
     )
     parser.add_argument(
         "-p", 

@@ -39,7 +39,17 @@ def main():
             sci = row["Scientific Name"].strip().split()
             genus = sci[0] if len(sci) > 0 else ""
             species = sci[1] if len(sci) > 1 else ""
-            state, country = core_processing.get_location_codes(row["Latitude"], row["Longitude"])
+            if (args.country_code and args.state_code):
+                state = args.state_code
+                country = args.country_code
+            elif (args.country_code):
+                state, country = core_processing.get_location_codes(row["Latitude"], row["Longitude"])
+                country = args.country_code
+            elif (args.state_code):
+                state, country = core_processing.get_location_codes(row["Latitude"], row["Longitude"])
+                state = args.state_code
+            else:
+                state, country = core_processing.get_location_codes(row["Latitude"], row["Longitude"])
             # The order of these datapoints are strictly required by eBird's Extended Record Format
             writer.writerow([
                 row["Common Name"].strip(), # Common Name
