@@ -36,6 +36,9 @@ def main():
         writer = csv.writer(outfile, lineterminator="\n")
         for row in reader:
             date, time = core_processing.parse_timestamp(row["Timestamp"])
+            if (args.filter_to_date) and (date != args.filter_to_date):
+                logger.debug(f'Entry outside of provided date filter found, skipping, date was: {date}')
+                continue
             sci = row["Scientific Name"].strip().split()
             genus = sci[0] if len(sci) > 0 else ""
             species = sci[1] if len(sci) > 1 else ""
