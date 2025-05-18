@@ -34,17 +34,17 @@ def main():
 
     output_file = None
     file_date = None
-    if (args.filter_to_date):
+    if args.filter_to_date:
         file_date = args.filter_to_date
     else:
-        #TODO: Ideally we would pull the date from the file itself, however this is more complicated to efficiently do
-        # and will be accomplished in a future revision.
+        #TODO: Ideally we would pull the date from the file itself, however this is more complicated
+        # to efficiently do and will be accomplished in a future revision.
         file_date = datetime.today().strftime("%m/%d/%Y")
-    if (args.output_file):
+    if args.output_file:
         output_file = args.output_file
     else:
-        output_file = os.path.join(config.output_path, 
-                                   core_processing.generate_filename("BirdWeather2eBird" , file_date))
+        output_file = os.path.join(config.output_path,
+                                   core_processing.generate_filename("BirdWeather2eBird", file_date))
 
     with open(args.input_file, newline="", encoding="utf-8") as infile, \
          open(output_file, "w", newline="", encoding="utf-8") as outfile:
@@ -66,14 +66,18 @@ def main():
             if (args.country_code and args.state_code):
                 state = args.state_code
                 country = args.country_code
-            elif (args.country_code):
-                state, country = core_processing.get_location_codes(row["Latitude"], row["Longitude"])
+            elif args.country_code:
+                state, country = core_processing.get_location_codes(row["Latitude"],
+                                                                    row["Longitude"])
                 country = args.country_code
-            elif (args.state_code):
-                state, country = core_processing.get_location_codes(row["Latitude"], row["Longitude"])
+            elif args.state_code:
+                state, country = core_processing.get_location_codes(row["Latitude"],
+                                                                    row["Longitude"])
                 state = args.state_code
             else:
-                state, country = core_processing.get_location_codes(row["Latitude"], row["Longitude"])
+                state, country = core_processing.get_location_codes(row["Latitude"],
+                                                                    row["Longitude"])
+
             # The order of these datapoints are strictly required by eBird's Extended Record Format
             writer.writerow([
                 row["Common Name"].strip(), # Common Name
