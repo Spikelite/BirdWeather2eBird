@@ -52,6 +52,7 @@ def main():
         writer = csv.writer(outfile, lineterminator="\n")
         # This is used to help determine if detections spanning multiple dates are included
         unique_dates = []
+        station_list = []
         for row in reader:
             date, time = core_processing.parse_timestamp(row["Timestamp"])
             if (args.filter_to_date) and (date != args.filter_to_date):
@@ -63,6 +64,7 @@ def main():
             sci = row["Scientific Name"].strip().split()
             genus = sci[0] if len(sci) > 0 else ""
             species = sci[1] if len(sci) > 1 else ""
+            station_name = row["Station"].strip()
             if (args.country_code and args.state_code):
                 state = args.state_code
                 country = args.country_code
@@ -77,6 +79,10 @@ def main():
             else:
                 state, country = core_processing.get_location_codes(row["Latitude"],
                                                                     row["Longitude"])
+            if args.comments:
+                checklist_comments = args.comments
+            else:
+                checklist_comments = config.checklist_comments
 
             # The order of these datapoints are strictly required by eBird's Extended Record Format
             writer.writerow([
@@ -86,7 +92,7 @@ def main():
                 "X",                        # Species Count (int if possible, X is best when a real
                                             #  number can not be confirmed)
                 config.SPECIES_COMMENTS,    # Species Comments
-                row["Station"].strip(),     # Location Name
+                station_name,               # Location Name
                 row["Latitude"],            # Latitude
                 row["Longitude"],           # Longitude
                 date,                       # Observation Date
@@ -99,7 +105,7 @@ def main():
                 config.ALL_OBS_REPORTED,    # All Observations Reported?
                 config.DISTANCE_COVERED,    # Distance Covered
                 config.AREA_COVERED,        # Area Covered
-                args.comments               # Checklist Comments
+                checklist_comments          # Checklist Comments
             ])
     if len(unique_dates) > 1:
         logger.warning(f"Multiple dates found in input: {unique_dates}")

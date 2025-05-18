@@ -128,7 +128,7 @@ def input_argparse():
         type=str,
         metavar="STR",
         help="Checklist Comments to include with submissions",
-        default=config.CHECKLIST_COMMENTS
+        required=False
     )
     parser.add_argument(
         "--filter_to_date",
