@@ -134,7 +134,7 @@ def input_argparse():
         "--filter_to_date",
         type=str,
         metavar="MM/DD/YYYY",
-        help="Filter input data to include only entries from the specified date (format: MM/DD/YYYY).",
+        help="Filter input data to only entries from the specified date (format: MM/DD/YYYY).",
         required=False
     )
 
