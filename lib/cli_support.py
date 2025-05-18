@@ -137,5 +137,11 @@ def input_argparse():
         help="Filter input data to only entries from the specified date (format: MM/DD/YYYY).",
         required=False
     )
+    parser.add_argument(
+        "--log_level",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        help="Set the log level to run the application at",
+        default=config.log_level
+    )
 
     return parser.parse_args()
