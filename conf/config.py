@@ -8,7 +8,7 @@ ALL_OBS_REPORTED = "Y"
 DISTANCE_COVERED = ""
 AREA_COVERED = ""
 SPECIES_COMMENTS = ""
-CHECKLIST_COMMENTS = ""
+checklist_comments = ""
 
 country_shape_file = ""
 state_shape_file = ""

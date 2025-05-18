@@ -34,17 +34,17 @@ def main():
 
     output_file = None
     file_date = None
-    if (args.filter_to_date):
+    if args.filter_to_date:
         file_date = args.filter_to_date
     else:
-        #TODO: Ideally we would pull the date from the file itself, however this is more complicated to efficiently do
-        # and will be accomplished in a future revision.
+        #TODO: Ideally we would pull the date from the file itself, however this is more complicated
+        # to efficiently do and will be accomplished in a future revision.
         file_date = datetime.today().strftime("%m/%d/%Y")
-    if (args.output_file):
+    if args.output_file:
         output_file = args.output_file
     else:
-        output_file = os.path.join(config.output_path, 
-                                   core_processing.generate_filename("BirdWeather2eBird" , file_date))
+        output_file = os.path.join(config.output_path,
+                                   core_processing.generate_filename("BirdWeather2eBird", file_date))
 
     with open(args.input_file, newline="", encoding="utf-8") as infile, \
          open(output_file, "w", newline="", encoding="utf-8") as outfile:
@@ -52,6 +52,7 @@ def main():
         writer = csv.writer(outfile, lineterminator="\n")
         # This is used to help determine if detections spanning multiple dates are included
         unique_dates = []
+        station_list = []
         for row in reader:
             date, time = core_processing.parse_timestamp(row["Timestamp"])
             if (args.filter_to_date) and (date != args.filter_to_date):
@@ -63,17 +64,26 @@ def main():
             sci = row["Scientific Name"].strip().split()
             genus = sci[0] if len(sci) > 0 else ""
             species = sci[1] if len(sci) > 1 else ""
+            station_name = row["Station"].strip()
             if (args.country_code and args.state_code):
                 state = args.state_code
                 country = args.country_code
-            elif (args.country_code):
-                state, country = core_processing.get_location_codes(row["Latitude"], row["Longitude"])
+            elif args.country_code:
+                state, country = core_processing.get_location_codes(row["Latitude"],
+                                                                    row["Longitude"])
                 country = args.country_code
-            elif (args.state_code):
-                state, country = core_processing.get_location_codes(row["Latitude"], row["Longitude"])
+            elif args.state_code:
+                state, country = core_processing.get_location_codes(row["Latitude"],
+                                                                    row["Longitude"])
                 state = args.state_code
             else:
-                state, country = core_processing.get_location_codes(row["Latitude"], row["Longitude"])
+                state, country = core_processing.get_location_codes(row["Latitude"],
+                                                                    row["Longitude"])
+            if args.comments:
+                checklist_comments = args.comments
+            else:
+                checklist_comments = config.checklist_comments
+
             # The order of these datapoints are strictly required by eBird's Extended Record Format
             writer.writerow([
                 row["Common Name"].strip(), # Common Name
@@ -82,7 +92,7 @@ def main():
                 "X",                        # Species Count (int if possible, X is best when a real
                                             #  number can not be confirmed)
                 config.SPECIES_COMMENTS,    # Species Comments
-                row["Station"].strip(),     # Location Name
+                station_name,               # Location Name
                 row["Latitude"],            # Latitude
                 row["Longitude"],           # Longitude
                 date,                       # Observation Date
@@ -95,7 +105,7 @@ def main():
                 config.ALL_OBS_REPORTED,    # All Observations Reported?
                 config.DISTANCE_COVERED,    # Distance Covered
                 config.AREA_COVERED,        # Area Covered
-                args.comments               # Checklist Comments
+                checklist_comments          # Checklist Comments
             ])
     if len(unique_dates) > 1:
         logger.warning(f"Multiple dates found in input: {unique_dates}")
