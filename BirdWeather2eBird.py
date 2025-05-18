@@ -25,7 +25,7 @@ from lib import core_processing
 from lib import cli_support
 
 args = cli_support.input_argparse()
-logger = cli_support.start_logging(config.log_file_path, config.log_level, config.tool_name)
+logger = cli_support.start_logging(config.log_file_path, args.log_level, config.tool_name)
 
 def main():
     logger.info('Running BirdWeather2eBird')
