@@ -43,7 +43,9 @@ def start_logging(log_path, log_level, logger_name):
     Returns:
         object: The logger object used for logging output
     """
+    ## Create the logger
     logger = logging.getLogger(logger_name)
+    ## Formats the logger
     output_format = logging.Formatter(
         '%(asctime)s [%(levelname)s]: %(message)s', "%Y-%m-%d %H:%M:%S")
     ## Setting log level
@@ -143,5 +145,9 @@ def input_argparse():
         help="Set the log level to run the application at",
         default=config.log_level
     )
-
+    parser.add_argument(
+        "--stats",
+        action='store_true',
+        help="Outputs stats about the processed data"
+    )
     return parser.parse_args()

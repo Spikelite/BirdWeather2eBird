@@ -17,6 +17,7 @@ You may not:
 All rights are reserved by the author.
 """
 import csv
+import logging
 import os
 from datetime import datetime
 
@@ -52,6 +53,8 @@ def main():
         writer = csv.writer(outfile, lineterminator="\n")
         # This is used to help determine if detections spanning multiple dates are included
         unique_dates = []
+        species_counts = {} # Stats: Dict to track count per species
+        total_detections = 0 # Stats: Total count of all detections
         for row in reader:
             date, time = core_processing.parse_timestamp(row["Timestamp"])
             if (args.filter_to_date) and (date != args.filter_to_date):
@@ -60,9 +63,10 @@ def main():
                 continue
             if date not in unique_dates:
                 unique_dates.append(date)
-            sci = row["Scientific Name"].strip().split()
-            genus = sci[0] if len(sci) > 0 else ""
-            species = sci[1] if len(sci) > 1 else ""
+            scientific_name = row["Scientific Name"].strip().split()
+            common_name = row["Common Name"].strip()
+            genus = scientific_name[0] if len(scientific_name) > 0 else ""
+            species = scientific_name[1] if len(scientific_name) > 1 else ""
             station_name = row["Station"].strip()
             if (args.country_code and args.state_code):
                 state = args.state_code
@@ -85,7 +89,7 @@ def main():
 
             # The order of these datapoints are strictly required by eBird's Extended Record Format
             writer.writerow([
-                row["Common Name"].strip(), # Common Name
+                common_name, # Common Name
                 genus,                      # Genus
                 species,                    # Species
                 "X",                        # Species Count (int if possible, X is best when a real
@@ -106,8 +110,23 @@ def main():
                 config.AREA_COVERED,        # Area Covered
                 checklist_comments          # Checklist Comments
             ])
+
+            total_detections += 1
+            species_counts[common_name] = species_counts.get(common_name, 0) + 1
     if len(unique_dates) > 1:
         logger.warning(f"Multiple dates found in input: {unique_dates}")
+
+    if args.stats:
+        logger.info('')
+        logger.info(f'Processed File Stats')
+        logger.info(f'Total Detections: {total_detections}')
+        logger.info(f'Total Species: {len(species_counts)}')
+        logger.info('')
+        logger.info(f'Species Stats')
+        for species, count in species_counts.items():
+            logger.info(f'{species}: {count}')
+        logger.info('')
+
     logger.info('BirdWeather2eBird ran Successfully!')
 
 if __name__ == "__main__":
