@@ -52,7 +52,6 @@ def main():
         writer = csv.writer(outfile, lineterminator="\n")
         # This is used to help determine if detections spanning multiple dates are included
         unique_dates = []
-        station_list = []
         for row in reader:
             date, time = core_processing.parse_timestamp(row["Timestamp"])
             if (args.filter_to_date) and (date != args.filter_to_date):
