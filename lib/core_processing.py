@@ -60,7 +60,7 @@ def generate_filename(base_name, date_str):
     """
     date_formatted = datetime.strptime(date_str, "%m/%d/%Y").strftime("%m%d%Y")
     random_str = generate_random_string()
-    return f"{base_name}-{random_str}-{date_formatted}.csv"
+    return f"{base_name}-{date_formatted}-{random_str}.csv"
 
 def parse_timestamp(ts):
     """
