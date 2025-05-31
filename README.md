@@ -1,6 +1,8 @@
 # BirdWeather2eBird
 Converts BirdWeather CSV Exports into eBird Record Format (Extended)
 
+Please read [eBird's submission guidelines](https://support.ebird.org/en/support/solutions/articles/48000907878-upload-spreadsheet-data-to-ebird#anchorAppropriateData) before using this tool! 
+
 ## 📋 Features
 
 - Import .csv from BirdWeather
@@ -11,13 +13,11 @@ Converts BirdWeather CSV Exports into eBird Record Format (Extended)
 ## 🐍 Requirements
 
 - Python 3.11 or newer
-- No external libraries required
+- External library requirements: [requirements.txt](https://github.com/Spikelite/BirdWeather2eBird/blob/main/requirements.txt)
   
 ---
 
 ## 🛠 Installation & Configuration
-
-This project does not require any external dependencies and runs natively on Python **3.11+**.
 
 ### 1. Clone the Repository
 ```
