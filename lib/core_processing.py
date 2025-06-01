@@ -26,9 +26,12 @@ You may not:
 
 All rights are reserved by the author.
 """
+import math
 import random
+import re
 import string
-from datetime import datetime
+from datetime import datetime, timedelta
+from typing import Tuple
 
 import fiona
 from shapely.geometry import Point, shape
@@ -76,6 +79,118 @@ def parse_timestamp(ts):
     date = dt.strftime("%m/%d/%Y")
     time = dt.strftime("%I:%M %p")
     return date, time
+
+def parse_time_period(time_tuple):
+    """
+    Converts a tuple from the args.checklist CLI input into a timedelta.
+
+    Accepted time units:
+    - 's' for seconds
+    - 'm' for minutes
+    - 'h' for hours
+    - 'D' for days
+
+    Args:
+        time_tuple (tuple[int, str]): A tuple with numeric value and time unit
+
+    Returns:
+        timedelta: The timedelta calculated from the input time_tuple
+
+    Raises:
+        ValueError: If the unit is invalid
+    """
+    amount, unit = time_tuple
+
+    if unit == 's':
+        return timedelta(seconds=amount)
+    elif unit == 'm':
+        return timedelta(minutes=amount)
+    elif unit == 'h':
+        return timedelta(hours=amount)
+    elif unit == 'D':
+        return timedelta(days=amount)
+    else:
+        raise ValueError(f"Invalid time unit: {unit}")
+    
+def get_duration(time_tuple):
+    """
+    Converts a time duration represented as a tuple into the total number of minutes,
+    rounded up to the nearest minute.
+
+    Args:
+        time_tuple (tuple[int, str]): A tuple with numeric value and time unit
+
+    Returns:
+        int: The total duration in minutes, rounded up to the nearest minute.
+
+    Raises:
+        ValueError: If the unit is invalid
+    """
+    amount, unit = time_tuple
+
+    if unit == 's':
+        return math.ceil(amount / 60)
+    elif unit == 'm':
+        return math.ceil(amount)
+    elif unit == 'h':
+        return math.ceil(amount * 60)
+    elif unit == 'D':
+        return math.ceil(amount * 1440)
+    else:
+        raise ValueError(f"Invalid time unit: {unit}")
+    
+def split_time_range(start: datetime, end: datetime, interval: timedelta):
+    """
+    Splits a datetime range into blocks of a given interval, ensuring that
+    no block spans multiple calendar days. If a block would cross midnight,
+    it is truncated at 23:59:59.999999 and a new block starts at 00:00:00.
+
+    Args:
+        start (datetime): The start of the full time range
+        end (datetime): The end of the full time range
+        interval (timedelta): The block size
+
+    Returns:
+        List[Tuple[datetime, datetime]]: List of block (start, end) times
+    """
+    blocks = []
+    current = start
+
+    while current < end:
+        # Tentative end of current block
+        next_block_end = current + interval
+
+        # Midnight boundary of current day
+        end_of_day = datetime.combine(current.date(), datetime.max.time())
+
+        # Ensure we don't go past end, or into next day
+        block_end = min(next_block_end, end_of_day, end)
+
+        blocks.append((current, block_end))
+        current = block_end
+
+        # If we hit the end-of-day, jump to start of next day
+        if current < end and current.time() == datetime.max.time():
+            current = datetime.combine((current + timedelta(days=1)).date(), datetime.min.time())
+
+    return blocks
+
+def format_time_block(block: Tuple[datetime, datetime]) -> str:
+    """
+    Formats a (start, end) datetime tuple into a string of the form:
+    DDmonYY_HHMM-HHMM (e.g., 16May24_1523-1528)
+
+    Args:
+        block (Tuple[datetime, datetime]): Tuple containing start and end datetimes, on the same day
+
+    Returns:
+        str: Formatted time block string
+    """
+    start, end = block
+    date_part = start.strftime("%d%b%y")  # e.g., 16May24
+    start_time = start.strftime("%H%M")   # e.g., 1523
+    end_time = end.strftime("%H%M")       # e.g., 1528
+    return f"{date_part}_{start_time}-{end_time}"
 
 def get_location_codes(lat, lon):
     """

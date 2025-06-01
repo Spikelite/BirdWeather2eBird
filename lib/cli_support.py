@@ -29,6 +29,7 @@ All rights are reserved by the author.
 
 import argparse
 import logging
+import re
 
 from conf import config
 
@@ -96,6 +97,13 @@ def input_argparse():
         required=False
     )
     parser.add_argument(
+        "--checklist",
+        type=parse_time_period_input,
+        metavar='N[s|m|h|D]',
+        help="Outputs as eBird Checklist Format (Grid) instead of eBird Record Format, using the input time interval",
+        required=False,
+    )
+    parser.add_argument(
         "--state_code",
         type=str,
         metavar="XX",
@@ -129,7 +137,7 @@ def input_argparse():
         "--comments",
         type=str,
         metavar="STR",
-        help="Checklist Comments to include with submissions",
+        help="Comment to include with submissions",
         required=False
     )
     parser.add_argument(
@@ -151,3 +159,30 @@ def input_argparse():
         help="Outputs stats about the processed data"
     )
     return parser.parse_args()
+
+def parse_time_period_input(value):
+    """
+    Parses a time period string, with case sensitivity.
+
+    Valid formats:
+        - Lowercase for seconds, minutes, hours: '30s', '15m', '4h'
+        - Uppercase for days: '1D'
+
+    Args:
+        value (str): A time period string in the format N[s|m|h|D]
+
+    Returns:
+        tuple[int, str]: A tuple of the numeric value and the unit character
+
+    Raises:
+        argparse.ArgumentTypeError: If the format does not match the expected pattern
+    """
+    pattern = r'^(\d+)(s|m|h|D)$'
+    match = re.match(pattern, value)
+    if not match:
+        raise argparse.ArgumentTypeError(
+            f"Invalid time period format: '{value}'. "
+            "Expected formats: 30s, 15m, 4h (lowercase); or 1D (uppercase)."
+        )
+    amount, unit = match.groups()
+    return int(amount), unit
