@@ -72,7 +72,7 @@ python BirdWeather2eBird.py -i 'C:\Users\BirdWatcher\Desktop\Detections-12345678
 ```
 9. Create an eBird account (https://secure.birds.cornell.edu/identity/account/create) if you do not have one, or login to your account if you do
 10. Go to the eBird `Import a file` page (https://ebird.org/import/upload.form)
-11. Select the processed file that was output by BirdWatcher2eBird, and set the format to `eBird Record Format (Extended)`, then press "Import File"<br>
+11. Select the processed file that was output by BirdWatcher2eBird, and set the format to `eBird Record Format (Extended)`, or `eBird Checklist Format (Grid)` if you used the `--checklist` flag, then press "Import File"<br>
 ![image](https://github.com/user-attachments/assets/0919c778-6003-4f3e-8561-ddf6ba18465c)
 ![image](https://github.com/user-attachments/assets/a44abac9-8720-4f95-806a-1b2e8c4a8a3c)
 12. Once successful, you will be redirected to the `My imports` section where you should see your import listed as `Completed`<br>
