@@ -100,7 +100,8 @@ def input_argparse():
         "--checklist",
         type=parse_time_period_input,
         metavar='N[s|m|h|D]',
-        help="Outputs as eBird Checklist Format (Grid) instead of eBird Record Format, using the input time interval",
+        help="Outputs as eBird Checklist Format (Grid) instead of eBird Record Format, using the input time interval."\
+             " Recommended: 1h for data from a 24/7/365 monitoring station",
         required=False,
     )
     parser.add_argument(
