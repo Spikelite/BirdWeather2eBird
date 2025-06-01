@@ -1,10 +1,11 @@
 # BirdWeather2eBird
-Converts BirdWeather CSV Exports into eBird Record Format (Extended)
+Converts BirdWeather CSV Exports into eBird Record Format (Extended) or eBird Checklist Format (Grid)
 
 ## 📋 Features
 
 - Import .csv from BirdWeather
 - Export .csv in eBird Extended Record Format
+- Export .csv in eBird Checklist Format
 
 ---
 
