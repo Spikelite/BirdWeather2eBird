@@ -203,7 +203,7 @@ def main():
                 # Because the species count information is a bit more dynamic and is a list of lists, we build and
                 # append it to its list by iterating over each row in the input CSV and filtering to the specific time
                 # block.
-                block_species_counts = {(common_name, scientific_name): 0 for (common_name, scientific_name) in 
+                block_species_counts = {(common_name, scientific_name): None for (common_name, scientific_name) in 
                                         species_counts}
                 for row in reader:
                     current_datetime = datetime.strptime(row["Timestamp"][:-6], "%Y-%m-%d %H:%M:%S")
@@ -212,7 +212,7 @@ def main():
                         scientific_name = row["Scientific Name"].strip()
                         common_name = row["Common Name"].strip()
                         species_tuple = (common_name, scientific_name)
-                        block_species_counts[species_tuple] = block_species_counts.get(species_tuple, 0) + 1
+                        block_species_counts[species_tuple] = ((block_species_counts.get(species_tuple) or 0) + 1)
                 block_species_counts_list.append(block_species_counts)
 
         # Write the final output into the eBird Checklist Format, as a .csv
