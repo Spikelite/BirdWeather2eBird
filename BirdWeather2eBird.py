@@ -160,7 +160,7 @@ def main():
         latitude_list = ["Latitude",""]
         longitude_list = ["Longitude",""]
         date_list = ["Date",""]
-        start_time_list = ["Start",""]
+        start_time_list = ["Start Time",""]
         state_list = ["State",""]
         country_list = ["Country",""]
         protocol_list = ["Protocol",""]
@@ -189,7 +189,7 @@ def main():
                                        f'{core_processing.format_time_block(date_time_tuple)}')
                 latitude_list.append(station_details["latitude"])
                 longitude_list.append(station_details["longitude"])
-                date_list.append(date_time_tuple[0].date())
+                date_list.append(date_time_tuple[0].date().strftime("%m/%d/%Y"))
                 start_time_list.append(date_time_tuple[0].time())
                 state_list.append(station_details["state"])
                 country_list.append(station_details["country"])
