@@ -148,17 +148,17 @@ def main():
         # This list will contain all of the different block's species counts, which are also lists
         species_counts_by_block = []
         # Iterate over our time blocks so that we create separate checklist entries for each block
-        for date_time_tuple in time_blocks:
+        for block_time in time_blocks:
             with open(args.input_file, newline="", encoding="utf-8") as infile:
                 reader = csv.DictReader(infile)
                 block_count += 1
                 # Append the station specific information to each time block entry in their respective lists
                 block_names.append(f'{station_details["station_name"]}-' \
-                                       f'{core_processing.format_time_block(date_time_tuple)}')
+                                       f'{core_processing.format_time_block(block_time)}')
                 block_latitudes.append(station_details["latitude"])
                 block_longitudes.append(station_details["longitude"])
-                block_dates.append(date_time_tuple[0].date().strftime("%m/%d/%Y"))
-                block_start_times.append(date_time_tuple[0].time())
+                block_dates.append(block_time[0].date().strftime("%m/%d/%Y"))
+                block_start_times.append(block_time[0].time())
                 block_states.append(station_details["state"])
                 block_countries.append(station_details["country"])
                 block_protocols.append(args.protocol)
@@ -176,7 +176,7 @@ def main():
                 for row in reader:
                     current_datetime = datetime.strptime(row["Timestamp"][:-6], "%Y-%m-%d %H:%M:%S")
                     # if start <= current <= end
-                    if date_time_tuple[0] <= current_datetime <= date_time_tuple[1]:
+                    if block_time[0] <= current_datetime <= block_time[1]:
                         scientific_name = row["Scientific Name"].strip()
                         common_name = row["Common Name"].strip()
                         species_tuple = (common_name, scientific_name)
