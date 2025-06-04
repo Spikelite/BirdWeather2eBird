@@ -54,14 +54,7 @@ def main():
         "first_detection": None,
         "last_detection": None
     }
-    station_details = {
-        "station_name": None,
-        "latitude": None,
-        "longitude": None,
-        "state": None,
-        "country": None
-    }
-    
+
     with open(args.input_file, newline="", encoding="utf-8") as infile, \
         open(output_file, "w", newline="", encoding="utf-8") as outfile:
         reader = csv.DictReader(infile)
@@ -87,32 +80,8 @@ def main():
             scientific_name_split = scientific_name.split()
             genus = scientific_name_split[0] if len(scientific_name_split) > 0 else ""
             species = scientific_name_split[1] if len(scientific_name_split) > 1 else ""
-            if not station_details["station_name"]:
-                station_details["station_name"] = row["Station"].strip()
-                station_details["latitude"] = row["Latitude"]
-                station_details["longitude"] = row["Longitude"]
-                if (args.country_code and args.state_code):
-                    station_details["state"] = args.state_code
-                    station_details["country"] = args.country_code
-                elif args.country_code:
-                    station_details["state"], station_details["country"] = core_processing.get_location_codes(
-                        row["Latitude"],
-                        row["Longitude"])
-                    station_details["country"] = args.country_code
-                elif args.state_code:
-                    station_details["state"], station_details["country"] = core_processing.get_location_codes(
-                        row["Latitude"],
-                        row["Longitude"])
-                    station_details["state"] = args.state_code
-                else:
-                    station_details["state"], station_details["country"] = core_processing.get_location_codes(
-                        row["Latitude"],
-                        row["Longitude"])
-            elif station_details["station_name"] != row["Station"].strip():
-                logger.error('Multiple stations detected, aborting')
-                logger.info('This script was only designed to work with a single station per execution')
-                sys.exit()
-            
+            station_details = core_processing.set_station_details(logger, args, row)
+
             if args.comments:
                 checklist_comments = args.comments
             else:

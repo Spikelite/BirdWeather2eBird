@@ -28,8 +28,8 @@ All rights are reserved by the author.
 """
 import math
 import random
-import re
 import string
+import sys
 from datetime import datetime, timedelta
 from typing import Tuple
 
@@ -260,6 +260,58 @@ def get_optimized_code_lookup(shapes):
         return None
 
     return find_code
+
+def set_station_details(logger, args, row):
+    """
+    Extract and return station metadata from a single row of input, applying optional overrides.
+
+    This function initializes a new station_details dictionary and populates it using data from the
+    provided row. If `args.state_code` or `args.country_code` are provided, they will override the
+    values derived from the station's latitude and longitude.
+
+    If the same function is called again with a different station name, it logs an error and exits,
+    as it is intended to handle only one station per run.
+
+    Args:
+        logger (logging.Logger): Logger for emitting error/info messages.
+        args (Namespace): Parsed command-line arguments, optionally containing `state_code` and `country_code`.
+        row (dict): A row of parsed CSV data with keys "Station", "Latitude", and "Longitude".
+
+    Returns:
+        dict: A dictionary with station metadata including:
+              - station_name (str)
+              - latitude (float)
+              - longitude (float)
+              - state (str)
+              - country (str)
+    """
+    station_details = {
+        "station_name": None,
+        "latitude": None,
+        "longitude": None,
+        "state": None,
+        "country": None
+    }
+    station_name = row["Station"].strip()
+
+    if not station_details["station_name"]:
+        station_details["station_name"] = station_name
+        lat = row["Latitude"]
+        lon = row["Longitude"]
+        station_details["latitude"] = lat
+        station_details["longitude"] = lon
+
+        derived_state, derived_country = get_location_codes(lat, lon)
+
+        station_details["state"] = args.state_code or derived_state
+        station_details["country"] = args.country_code or derived_country
+
+    elif station_details["station_name"] != station_name:
+        logger.error("Multiple stations detected, aborting")
+        logger.info("This script was only designed to work with a single station per execution")
+        sys.exit()
+
+    return station_details
 
 # Load shapes once to improve performance for repeat lookups
 country_shapes = load_shapes(config.country_shape_file, 'ISO_A2')
