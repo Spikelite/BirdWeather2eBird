@@ -18,7 +18,6 @@ All rights are reserved by the author.
 """
 import csv
 import os
-import sys
 from datetime import datetime
 
 from conf import config
@@ -171,7 +170,7 @@ def main():
                 # Because the species count information is a bit more dynamic and is a list of lists, we build and
                 # append it to its list by iterating over each row in the input CSV and filtering to the specific time
                 # block.
-                block_species_counts = {(common_name, scientific_name): None for (common_name, scientific_name) in 
+                block_species_counts = {(common_name, scientific_name): None for (common_name, scientific_name) in
                                         species_counts}
                 for row in reader:
                     current_datetime = datetime.strptime(row["Timestamp"][:-6], "%Y-%m-%d %H:%M:%S")
