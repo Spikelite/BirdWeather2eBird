@@ -18,6 +18,7 @@ All rights are reserved by the author.
 """
 import csv
 import os
+import sys
 from datetime import datetime
 
 from conf import config
@@ -119,9 +120,12 @@ def main():
 
     if args.checklist:
         # Get time blocks:
-        time_blocks = core_processing.split_time_range(detection_firstlast["first_detection"], 
-                                         detection_firstlast["last_detection"],
-                                         core_processing.parse_time_period(args.checklist))
+        if (detection_firstlast["first_detection"] is None) and (detection_firstlast["last_detection"] is None):
+            logger.error(f"Input file did not contain any matches within specified --filter_to_date")
+            sys.exit()
+        time_blocks = core_processing.split_time_range(detection_firstlast["first_detection"],
+                                                       detection_firstlast["last_detection"],
+                                                       core_processing.parse_time_period(args.checklist))
         # Generate a list of block names
         block_names = ["",""]
         block_latitudes = ["Latitude",""]
