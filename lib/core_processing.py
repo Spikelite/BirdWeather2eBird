@@ -26,9 +26,12 @@ You may not:
 
 All rights are reserved by the author.
 """
+import math
 import random
 import string
-from datetime import datetime
+import sys
+from datetime import datetime, timedelta
+from typing import Tuple
 
 import fiona
 from shapely.geometry import Point, shape
@@ -76,6 +79,118 @@ def parse_timestamp(ts):
     date = dt.strftime("%m/%d/%Y")
     time = dt.strftime("%I:%M %p")
     return date, time
+
+def parse_time_period(time_tuple):
+    """
+    Converts a tuple from the args.checklist CLI input into a timedelta.
+
+    Accepted time units:
+    - 's' for seconds
+    - 'm' for minutes
+    - 'h' for hours
+    - 'D' for days
+
+    Args:
+        time_tuple (tuple[int, str]): A tuple with numeric value and time unit
+
+    Returns:
+        timedelta: The timedelta calculated from the input time_tuple
+
+    Raises:
+        ValueError: If the unit is invalid
+    """
+    amount, unit = time_tuple
+
+    if unit == 's':
+        return timedelta(seconds=amount)
+    elif unit == 'm':
+        return timedelta(minutes=amount)
+    elif unit == 'h':
+        return timedelta(hours=amount)
+    elif unit == 'D':
+        return timedelta(days=amount)
+    else:
+        raise ValueError(f"Invalid time unit: {unit}")
+    
+def get_duration(time_tuple):
+    """
+    Converts a time duration represented as a tuple into the total number of minutes,
+    rounded up to the nearest minute.
+
+    Args:
+        time_tuple (tuple[int, str]): A tuple with numeric value and time unit
+
+    Returns:
+        int: The total duration in minutes, rounded up to the nearest minute.
+
+    Raises:
+        ValueError: If the unit is invalid
+    """
+    amount, unit = time_tuple
+
+    if unit == 's':
+        return math.ceil(amount / 60)
+    elif unit == 'm':
+        return math.ceil(amount)
+    elif unit == 'h':
+        return math.ceil(amount * 60)
+    elif unit == 'D':
+        return math.ceil(amount * 1440)
+    else:
+        raise ValueError(f"Invalid time unit: {unit}")
+    
+def split_time_range(start: datetime, end: datetime, interval: timedelta):
+    """
+    Splits a datetime range into blocks of a given interval, ensuring that
+    no block spans multiple calendar days. If a block would cross midnight,
+    it is truncated at 23:59:59.999999 and a new block starts at 00:00:00.
+
+    Args:
+        start (datetime): The start of the full time range
+        end (datetime): The end of the full time range
+        interval (timedelta): The block size
+
+    Returns:
+        List[Tuple[datetime, datetime]]: List of block (start, end) times
+    """
+    blocks = []
+    current = start
+
+    while current < end:
+        # Tentative end of current block
+        next_block_end = current + interval
+
+        # Midnight boundary of current day
+        end_of_day = datetime.combine(current.date(), datetime.max.time())
+
+        # Ensure we don't go past end, or into next day
+        block_end = min(next_block_end, end_of_day, end)
+
+        blocks.append((current, block_end))
+        current = block_end
+
+        # If we hit the end-of-day, jump to start of next day
+        if current < end and current.time() == datetime.max.time():
+            current = datetime.combine((current + timedelta(days=1)).date(), datetime.min.time())
+
+    return blocks
+
+def format_time_block(block: Tuple[datetime, datetime]) -> str:
+    """
+    Formats a (start, end) datetime tuple into a string of the form:
+    DDmonYY_HHMM-HHMM (e.g., 16May24_1523-1528)
+
+    Args:
+        block (Tuple[datetime, datetime]): Tuple containing start and end datetimes, on the same day
+
+    Returns:
+        str: Formatted time block string
+    """
+    start, end = block
+    date_part = start.strftime("%d%b%y")  # e.g., 16May24
+    start_time = start.strftime("%H%M")   # e.g., 1523
+    end_time = end.strftime("%H%M")       # e.g., 1528
+    return f"{date_part}_{start_time}-{end_time}"
 
 def get_location_codes(lat, lon):
     """
@@ -145,6 +260,58 @@ def get_optimized_code_lookup(shapes):
         return None
 
     return find_code
+
+def set_station_details(logger, args, row):
+    """
+    Extract and return station metadata from a single row of input, applying optional overrides.
+
+    This function initializes a new station_details dictionary and populates it using data from the
+    provided row. If `args.state_code` or `args.country_code` are provided, they will override the
+    values derived from the station's latitude and longitude.
+
+    If the same function is called again with a different station name, it logs an error and exits,
+    as it is intended to handle only one station per run.
+
+    Args:
+        logger (logging.Logger): Logger for emitting error/info messages.
+        args (Namespace): Parsed command-line arguments, optionally containing `state_code` and `country_code`.
+        row (dict): A row of parsed CSV data with keys "Station", "Latitude", and "Longitude".
+
+    Returns:
+        dict: A dictionary with station metadata including:
+              - station_name (str)
+              - latitude (float)
+              - longitude (float)
+              - state (str)
+              - country (str)
+    """
+    station_details = {
+        "station_name": None,
+        "latitude": None,
+        "longitude": None,
+        "state": None,
+        "country": None
+    }
+    station_name = row["Station"].strip()
+
+    if not station_details["station_name"]:
+        station_details["station_name"] = station_name
+        lat = row["Latitude"]
+        lon = row["Longitude"]
+        station_details["latitude"] = lat
+        station_details["longitude"] = lon
+
+        derived_state, derived_country = get_location_codes(lat, lon)
+
+        station_details["state"] = args.state_code or derived_state
+        station_details["country"] = args.country_code or derived_country
+
+    elif station_details["station_name"] != station_name:
+        logger.error("Multiple stations detected, aborting")
+        logger.info("This script was only designed to work with a single station per execution")
+        sys.exit()
+
+    return station_details
 
 # Load shapes once to improve performance for repeat lookups
 country_shapes = load_shapes(config.country_shape_file, 'ISO_A2')
