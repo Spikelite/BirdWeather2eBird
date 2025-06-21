@@ -155,22 +155,7 @@ def main():
             with open(args.input_file, newline="", encoding="utf-8") as infile:
                 reader = csv.DictReader(infile)
                 block_count += 1
-                # Append the station specific information to each time block entry in their respective lists
-                block_names.append(f'{station_details["station_name"]}-' \
-                                       f'{core_processing.format_time_block(block_time)}')
-                block_latitudes.append(station_details["latitude"])
-                block_longitudes.append(station_details["longitude"])
-                block_dates.append(block_time[0].date().strftime("%m/%d/%Y"))
-                block_start_times.append(block_time[0].time())
-                block_states.append(station_details["state"])
-                block_countries.append(station_details["country"])
-                block_protocols.append(args.protocol)
-                block_num_obs.append("1")
-                block_durations.append(checklist_duration)
-                block_all_obs_reported.append("Y")
-                block_dist_traveled.append("")
-                block_area_covered.append("")
-                block_notes.append(checklist_comments)
+                block_contains_detection = False
                 # Because the species count information is a bit more dynamic and is a list of lists, we build and
                 # append it to its list by iterating over each row in the input CSV and filtering to the specific time
                 # block.
@@ -180,11 +165,33 @@ def main():
                     current_datetime = datetime.strptime(row["Timestamp"][:-6], "%Y-%m-%d %H:%M:%S")
                     # if start <= current <= end
                     if block_time[0] <= current_datetime <= block_time[1]:
+                        block_contains_detection = True
                         scientific_name = row["Scientific Name"].strip()
                         common_name = row["Common Name"].strip()
                         species_tuple = (common_name, scientific_name)
                         block_species_counts[species_tuple] = ((block_species_counts.get(species_tuple) or 0) + 1)
-                species_counts_by_block.append(block_species_counts)
+
+                if block_contains_detection:
+                    # Append the station specific information to each time block entry in their respective lists
+                    block_names.append(f'{station_details["station_name"]}-' \
+                                        f'{core_processing.format_time_block(block_time)}')
+                    block_latitudes.append(station_details["latitude"])
+                    block_longitudes.append(station_details["longitude"])
+                    block_dates.append(block_time[0].date().strftime("%m/%d/%Y"))
+                    block_start_times.append(block_time[0].time())
+                    block_states.append(station_details["state"])
+                    block_countries.append(station_details["country"])
+                    block_protocols.append(args.protocol)
+                    block_num_obs.append("1")
+                    block_durations.append(checklist_duration)
+                    block_all_obs_reported.append("Y")
+                    block_dist_traveled.append("")
+                    block_area_covered.append("")
+                    block_notes.append(checklist_comments)
+                    # Append the block species count
+                    species_counts_by_block.append(block_species_counts)
+                else:
+                    logger.info(f"Time block ({block_time[0]} - {block_time[1]}) contained no detections, skipping")
 
         # Write the final output into the eBird Checklist Format, as a .csv
         with open(output_file, "w", newline="", encoding="utf-8") as outfile:
